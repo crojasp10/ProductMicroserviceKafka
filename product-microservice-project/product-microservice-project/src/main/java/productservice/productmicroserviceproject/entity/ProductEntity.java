@@ -33,6 +33,10 @@ public class ProductEntity {
 
     private boolean available;
 
+    private Integer quantityToBuy;
+
+    private Integer minStock;
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;

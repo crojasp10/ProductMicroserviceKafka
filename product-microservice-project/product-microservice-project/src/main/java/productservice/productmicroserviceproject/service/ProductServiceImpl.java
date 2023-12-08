@@ -1,6 +1,7 @@
 package productservice.productmicroserviceproject.service;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
@@ -10,17 +11,15 @@ import productservice.productmicroserviceproject.mapper.ProductMapper;
 import productservice.productmicroserviceproject.models.Product;
 import productservice.productmicroserviceproject.repository.CategoryRepository;
 import productservice.productmicroserviceproject.repository.ProductRepository;
-import productservice.productmicroserviceproject.service.event.ProductEventService;
 
 
 import java.util.List;
 
 
 @Service
-
+@Slf4j
 public class ProductServiceImpl implements ProductService{
 
-    private final ProductEventService productEventService;
 
     @Autowired
     private ProductMapper productMapper;
@@ -31,9 +30,7 @@ public class ProductServiceImpl implements ProductService{
     @Autowired
     private CategoryRepository categoryRepository;
 
-    public ProductServiceImpl(ProductEventService productEventService) {
-        this.productEventService = productEventService;
-    }
+
 
     @Override
     public List<ProductEntity> findAll() {
@@ -76,11 +73,13 @@ public class ProductServiceImpl implements ProductService{
             productToSave.setCost(product.getCost());
             productToSave.setAvailable(product.isAvailable());
             productToSave.setStock(product.getStock());
+            productToSave.setMinStock(product.getMinStock());
+            productToSave.setQuantityToBuy(product.getQuantityToBuy());
             productToSave.setCategory(actualCategory);
 
             Product productToPublish = productMapper.entityToModel(productToSave);
 
-            productEventService.publish(productToPublish);
+
         }
 
         return productRepository.save(productToSave);
@@ -116,8 +115,12 @@ public class ProductServiceImpl implements ProductService{
                 existingProduct.setCode(product.getCode());
                 existingProduct.setAvailable(product.isAvailable());
                 existingProduct.setStock(product.getStock());
+                existingProduct.setQuantityToBuy(product.getQuantityToBuy());
+                existingProduct.setCost(product.getCost());
+                existingProduct.setMinStock(product.getMinStock());
                 existingProduct.setCategory(actualCategory);
 
+                log.info("productUpdated is "+existingProduct);
                 productRepository.save(existingProduct);
             }
 
